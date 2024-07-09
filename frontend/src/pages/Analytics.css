@@ -1,0 +1,41 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .alert {
+    font-size: 1.5rem;
+  }
+  
+  .btn-primary {
+    margin-bottom: 1rem;
+  }
+  
+  .charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .chart-item {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-item canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .chart-item {
+      padding: 0.5rem;
+    }
+  }
+  
