@@ -9,7 +9,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointEleme
 const fetchComplaints = async () => {
   try {
     const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-
     const response = await fetch('http://localhost:5000/api/GetAllComplaints', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -19,6 +18,7 @@ const fetchComplaints = async () => {
     if (!response.ok) {
       throw new Error('Failed to fetch complaints');
     }
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -33,47 +33,64 @@ const Analytics = () => {
   const [complaintsPerDayData, setComplaintsPerDayData] = useState({});
 
   useEffect(() => {
-    fetchComplaints().then(data => {
-      if (Array.isArray(data)) {
-        const departments = [...new Set(data.map(complaint => complaint.department))];
-        const complaintsPerDepartment = departments.map(department =>
-          data.filter(complaint => complaint.department === department).length
-        );
+    fetchComplaints()
+      .then(data => {
+        console.log('Fetched complaints:', data);
 
-        setChartData({
-          labels: departments,
-          datasets: [
-            {
-              label: 'Number of Complaints',
-              data: complaintsPerDepartment,
-              backgroundColor: 'rgba(75, 192, 192, 0.6)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 1,
-            },
-          ],
-        });
+        if (Array.isArray(data)) {
+          // Process complaints per department
+          const departments = [...new Set(data.map(complaint => complaint.department))];
+          const complaintsPerDepartment = departments.map(department =>
+            data.filter(complaint => complaint.department === department).length
+          );
 
-        const dates = data.map(complaint => new Date(complaint.date).toLocaleDateString());
-        const uniqueDates = [...new Set(dates)];
-        const complaintsPerDay = uniqueDates.map(date =>
-          data.filter(complaint => new Date(complaint.date).toLocaleDateString() === date).length
-        );
+          console.log('Departments:', departments);
+          console.log('Complaints per department:', complaintsPerDepartment);
 
-        setComplaintsPerDayData({
-          labels: uniqueDates,
-          datasets: [
-            {
-              label: 'Number of Complaints Per Day',
-              data: complaintsPerDay,
-              backgroundColor: 'rgba(153, 102, 255, 0.6)',
-              borderColor: 'rgba(153, 102, 255, 1)',
-              borderWidth: 1,
-              fill: false,
-            },
-          ],
-        });
-      }
-    });
+          setChartData({
+            labels: departments,
+            datasets: [
+              {
+                label: 'Number of Complaints',
+                data: complaintsPerDepartment,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+              },
+            ],
+          });
+
+          // Process complaints per day
+          const dateCounts = data.reduce((acc, complaint) => {
+            const date = new Date(complaint.date).toLocaleDateString();
+            acc[date] = (acc[date] || 0) + 1;
+            return acc;
+          }, {});
+
+          const uniqueDates = Object.keys(dateCounts);
+          const complaintsPerDay = uniqueDates.map(date => dateCounts[date]);
+
+          console.log('Unique dates:', uniqueDates);
+          console.log('Complaints per day:', complaintsPerDay);
+
+          setComplaintsPerDayData({
+            labels: uniqueDates,
+            datasets: [
+              {
+                label: 'Number of Complaints Per Day',
+                data: complaintsPerDay,
+                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1,
+                fill: false,
+              },
+            ],
+          });
+        } else {
+          console.error('Data is not an array:', data);
+        }
+      })
+      .catch(error => console.error('Error in useEffect:', error));
   }, []);
 
   const handleGoToAdmin = () => {
