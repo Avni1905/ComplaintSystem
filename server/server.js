@@ -1,73 +1,54 @@
-const Handlers = require('./handlers')
-const Middlewares = require('./middlewares')
-const express = require('express')
+const express = require('express');
 const multer = require('multer');
-var cors = require('cors')
-const fs = require('fs')
-const path = require('path')
-// const https = require('https')
-const middlewares = require('./middlewares')
-require('dotenv').config()
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 const mongoose = require('mongoose');
+const Handlers = require('./handlers');
+const Middlewares = require('./middlewares');
 
-const uri = 'mongodb://localhost:27017/ComplaintSystem';
+const uri = process.env.MONGODB_URI || 'mongodb+srv://avnig1905:MongoDbAvni@complaintfix.iqvxpa3.mongodb.net/?retryWrites=true&w=majority&appName=ComplaintFix';
 
-// mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => {
-//     console.log('Successfully connected to MongoDB');
-//   })
-//   .catch((err) => {
-//     console.error('Error connecting to MongoDB:', err.message);
-//   });
+// Connect to MongoDB
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Successfully connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err.message);
+  });
 
-
-// const { create } = require('domain');
-const privateKey = fs.readFileSync('./cert/key.pem', 'utf8')
-const certificate = fs.readFileSync('./cert/cert.pem', 'utf8')
+const privateKey = fs.readFileSync('./cert/key.pem', 'utf8');
+const certificate = fs.readFileSync('./cert/cert.pem', 'utf8');
 const upload = multer({ dest: 'uploads/' });
-const credentials = { key: privateKey, cert: certificate }
+const credentials = { key: privateKey, cert: certificate };
 
-const app = express()
-const port = process.env.PORT || 5000
+const app = express();
+const port = process.env.PORT || 5000;
 
-app.use(cors())
-app.use(cors({ origin: 'http://localhost:3000' }))
-
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-
-app.use(express.static(path.join(__dirname, '../build')))
+app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../build')));
 
 app.get(['/', '/UserScreen', '/AdminScreen*', '/Registration'], (req, res) => {
-	res.sendFile(path.join(__dirname, '../build', 'index.html'))
-	// res.send('Whoooohoo')
-})
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
+
 app.post(
-	'/api/Registration',
-	Middlewares.checkDuplicateUsernameOrEmail,
-	Handlers.Registration
-)
-app.get('/api/AllUsers', Handlers.GetUsers)
-app.post('/api/add-complaint', middlewares.verifyToken, upload.single('image') , Handlers.AddComplaint)
-app.post('/api/login', Handlers.login)
-app.get(
-	'/api/GetAllComplaints',
-	Middlewares.verifyToken,
-	Handlers.GetComplaints
-)
-app.get(
-	'/api/complaintsByUser',
-	Middlewares.verifyToken,
-	Handlers.GetComplaintsByUser
-)
-app.get('/api/RefreshToken', Middlewares.verifyToken, Handlers.RefreshToken)
+  '/api/Registration',
+  Middlewares.checkDuplicateUsernameOrEmail,
+  Handlers.Registration
+);
 
-// app.post('/api/UpdateComplaintStatus', Handlers.UpdateComplaintStatus)
-// app.delete('/api/DeleteAcomplaint', Handlers.DeleteAcomplaint)
-
-// const httpsServer = https.createServer(credentials, app)
-// httpsServer.listen(4000,()=>{console.log("httpsss at 4000")})
+app.get('/api/AllUsers', Handlers.GetUsers);
+app.post('/api/add-complaint', Middlewares.verifyToken, upload.single('image'), Handlers.AddComplaint);
+app.post('/api/login', Handlers.login);
+app.get('/api/GetAllComplaints', Middlewares.verifyToken, Handlers.GetComplaints);
+app.get('/api/complaintsByUser', Middlewares.verifyToken, Handlers.GetComplaintsByUser);
+app.get('/api/RefreshToken', Middlewares.verifyToken, Handlers.RefreshToken);
 
 app.listen(port, () => {
-	console.log(`listening at http://localhost:${port}`)
-})
+  console.log(`Listening at http://localhost:${port}`);
+});

@@ -4,7 +4,7 @@ require('dotenv').config()
 
 const DB_Key = process.env.DB_Key
 
-const localurl = "mongodb://localhost:27017/complaintSystem"
+const localurl = "mongodb+srv://avnig1905:MongoDbAvni@complaintfix.iqvxpa3.mongodb.net/?retryWrites=true&w=majority&appName=ComplaintFix"
 
   mongoose.connect(localurl, {useNewUrlParser: true, useUnifiedTopology: true} ,(error)=>{
 
