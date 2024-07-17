@@ -8,7 +8,7 @@ const fetchComplaints = async () => {
   try {
     const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
 
-    const response = await fetch('http://localhost:5000/api/GetAllComplaints', {
+    const response = await fetch('https://complaintfix.onrender.com/api/GetAllComplaints', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -88,7 +88,7 @@ const Admin = () => {
               <strong>Department:</strong> {complaint.department}<br />
               <strong>Nature:</strong> {complaint.nature}<br />
               {complaint.image && (
-                <img src={`http://localhost:5000/${complaint.image}`} alt="Complaint" className="img-fluid mt-2" style={{ maxWidth: '200px' }} />
+                <img src={`https://complaintfix.onrender.com/${complaint.image}`} alt="Complaint" className="img-fluid mt-2" style={{ maxWidth: '200px' }} />
               )}
             </li>
           ))}

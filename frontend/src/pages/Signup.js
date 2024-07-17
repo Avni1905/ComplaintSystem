@@ -42,7 +42,7 @@ const Signup = () => {
 
     // Send POST request to the backend
     try {
-      const response = await fetch("http://localhost:5000/api/Registration", {
+      const response = await fetch("https://complaintfix.onrender.com/api/registration", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

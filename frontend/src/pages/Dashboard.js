@@ -37,7 +37,7 @@ const Dashboard = () => {
       formDataToSend.append('image', formData.image);
       formDataToSend.append('nature', formData.nature);
 
-      const response = await fetch('http://localhost:5000/api/add-complaint', {
+      const response = await fetch('https://complaintfix.onrender.com/api/add-complaint', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
